@@ -2,7 +2,7 @@
 	import CompanyInfo from './pages/CompanyInfo.svelte';
 	import Launchs from './pages/Launchs.svelte';
 	import Launchpads from './pages/Launchpads.svelte';
-	export let active = 2;
+	export let active = 1;
 	const navItems = [
 		{
 			id: 1,
