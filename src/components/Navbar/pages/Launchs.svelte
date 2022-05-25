@@ -127,7 +127,7 @@
 				<p class="font-sans text-lg font-bold">No result found</p>
 			{/if}
 		</div>
-		{#if isVisible}
+		{#if isVisible && filterLaunchs.length >= 25}
 			<div class="text-center mt-5 p-4">
 				<button
 					on:click={loadMore}
