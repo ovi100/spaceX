@@ -8,6 +8,9 @@
 	let loading = true;
 	let launchs = [];
 	let filterLaunchs = [];
+	let numberOfData;
+	let dataLimit = 15;
+	let isVisible = true;
 
 	onMount(async () => {
 		const res = await fetch('https://api.spacexdata.com/v3/launches');
@@ -26,6 +29,16 @@
 				return launch.rocket.rocket_name.toLowerCase().includes(keywords.toLowerCase());
 			});
 		}
+	}
+
+	function loadMore() {
+		numberOfData = launchs.length;
+		dataLimit = dataLimit + 10;
+
+		if (numberOfData <= dataLimit) {
+			return (isVisible = false);
+		}
+		return dataLimit;
 	}
 
 	$: {
@@ -107,12 +120,22 @@
 		</div>
 		<div class="grid grid-cols-5 gap-4 mt-5 px-4">
 			{#if filterLaunchs.length > 0}
-				{#each filterLaunchs as launch}
+				{#each filterLaunchs.slice(0, dataLimit) as launch}
 					<Card {launch} />
 				{/each}
 			{:else}
 				<p class="font-sans text-lg font-bold">No result found</p>
 			{/if}
 		</div>
+		{#if isVisible}
+			<div class="text-center mt-5 p-4">
+				<button
+					on:click={loadMore}
+					class="text-center bg-indigo-600 border border-transparent rounded-md py-3 px-4 font-medium text-white hover:bg-indigo-700"
+				>
+					Load more
+				</button>
+			</div>
+		{/if}
 	</div>
 {/if}
