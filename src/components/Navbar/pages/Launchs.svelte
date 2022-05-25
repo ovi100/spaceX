@@ -12,47 +12,41 @@
 	onMount(async () => {
 		const res = await fetch('https://api.spacexdata.com/v3/launches');
 		launchs = await res.json();
+		filterLaunchs = launchs;
 		//console.log(launchs);
 		loading = false;
 	});
 
-	$: {
-		if (keywords) {
-			//selectedFilter = 'All';
-			filterLaunchs = launchs.filter((name) =>
-				name.rocket.rocket_name.toLowerCase().includes(keywords.toLowerCase())
-			);
-			console.log('Search Keyword:', keywords);
-			console.log('Search Data:', filterLaunchs);
-		}
+	function searchData() {
+		filterLaunchs = launchs;
 
+		if (keywords && selectedFilter === 'All') {
+			//selectedFilter = 'All';
+			filterLaunchs = launchs.filter((launch) => {
+				return launch.rocket.rocket_name.toLowerCase().includes(keywords.toLowerCase());
+			});
+		}
+	}
+
+	$: {
 		if (selectedFilter) {
 			//keywords = '';
 			if (selectedFilter.toLowerCase() === 'all') {
-				launchs;
-				console.log('All Data:', launchs);
+				filterLaunchs = launchs;
 			}
 			if (selectedFilter.toLowerCase() === 'upcoming') {
 				filterLaunchs = launchs.filter((data) => data.upcoming === true);
-				console.log('Selected Filter:', selectedFilter);
-				console.log('Filtered Data:', filterLaunchs);
 			}
 			if (selectedFilter.toLowerCase() === 'not upcoming') {
 				filterLaunchs = launchs.filter((data) => data.upcoming === false);
-				console.log('Selected Filter:', selectedFilter);
-				console.log('Filtered Data:', filterLaunchs);
 			}
 			if (selectedFilter.toLowerCase() === 'successful') {
 				filterLaunchs = launchs.filter((data) => data.launch_success === true);
-				console.log('Selected Filter:', selectedFilter);
-				console.log('Filtered Data:', filterLaunchs);
 			}
 			if (selectedFilter.toLowerCase() === 'unsuccessful') {
 				filterLaunchs = launchs.filter(
 					(data) => data.launch_success === false || data.launch_success === null
 				);
-				console.log('Selected Filter:', selectedFilter);
-				console.log('Filtered Data:', filterLaunchs);
 			}
 		}
 	}
@@ -87,6 +81,7 @@
 						type="text"
 						placeholder="search by roket name"
 						bind:value={keywords}
+						on:keyup={searchData}
 					/>
 				</div>
 				<div class="keywords">
@@ -111,16 +106,8 @@
 			</div>
 		</div>
 		<div class="grid grid-cols-5 gap-4 mt-5 px-4">
-			{#if keywords === '' || selectedFilter === ''}
-				{#each launchs as launch}
-					<Card {launch} />
-				{/each}
-			{:else if keywords.length > 0 && launchs.filter((name) => name.rocket.rocket_name
-						.toLowerCase()
-						.includes(keywords.toLowerCase())).length > 0}
-				{#each launchs.filter((name) => name.rocket.rocket_name
-						.toLowerCase()
-						.includes(keywords.toLowerCase())) as launch}
+			{#if filterLaunchs.length > 0}
+				{#each filterLaunchs as launch}
 					<Card {launch} />
 				{/each}
 			{:else}
